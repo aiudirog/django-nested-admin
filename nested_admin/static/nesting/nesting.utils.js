@@ -588,7 +588,16 @@ var DJNesting = (typeof window.DJNesting != "undefined")
                 if (emptyPos > 0) {
                     var beforeEmpty = val.substr(0, emptyPos+1),
                         afterEmpty = val.substr(emptyPos+emptyLen),
+                        afterEmptyPos = afterEmpty.indexOf('-empty');
+                    // Elements that need index replaced with __prefix__ are those which are direct decendents
+                    // (great-grandchildren) of a template (a tbody ending in -empty) and not extras.
+                    // If -empty appears in afterEmpty and it is not a part of a template, it is an extra
+                    // and we don't want replace anything.
+                    if (emptyPos > 0 && !elem.parentElement.parentElement.parentElement.id.endsWith("-empty")) {
+                        newVal = beforeEmpty + index + afterEmpty;
+                    } else {
                         newVal = beforeEmpty + index + afterEmpty.replace(index, '__prefix__');
+                    }
                     elem.setAttribute(attr, newVal);
                 }
             });
